@@ -5,11 +5,11 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.InteropServices;
-using System.Threading; // 用于 Thread.Sleep
+using System.Threading; // 必须引入，用于 Mutex
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Threading; // 用于 DispatcherTimer
+using System.Windows.Threading;
 using Microsoft.Win32;
 using Hardcodet.Wpf.TaskbarNotification;
 using WinForms = System.Windows.Forms;
@@ -22,12 +22,14 @@ namespace AutoGameHDR
         private const string GITHUB_WHITELIST_URL = "https://raw.githubusercontent.com/sysxfml/HDR-Game-Database/main/games_list.txt";
         private const string APP_NAME = "AutoGameHDR";
 
+        // 【新增】互斥体变量，必须是 static 以防止被垃圾回收
+        private static Mutex _mutex = null;
+
         private TaskbarIcon _trayIcon;
 
         // 【核心】极速轮询定时器
         private DispatcherTimer _fastPoller;
 
-        // 【修复】补全之前遗漏的菜单项变量定义
         private MenuItem _themeAutoItem;
         private MenuItem _themeLightItem;
         private MenuItem _themeDarkItem;
@@ -62,12 +64,42 @@ namespace AutoGameHDR
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            // ============================================================
+            // 1. 【新增】单例模式检查 (防止多开)
+            // ============================================================
+            const string mutexName = "Global\\AutoGameHDR_Unique_Mutex_ID_v1";
+            bool createdNew;
+
+            // 尝试创建一个全局互斥锁
+            _mutex = new Mutex(true, mutexName, out createdNew);
+
+            if (!createdNew)
+            {
+                // 如果 createdNew 为 false，说明锁已经存在，程序已经在运行了
+                MessageBox.Show("AutoGameHDR 已经在后台运行中！\n请检查任务栏右下角的托盘图标。",
+                                "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                // 退出当前这个多余的实例
+                Application.Current.Shutdown();
+                return;
+            }
+
+            // ============================================================
+            // 2. 正常启动流程
+            // ============================================================
             base.OnStartup(e);
 
             InitLocalization();
             LoadThemeSetting();
             InitializeTrayIcon();
             LoadLocalData();
+
+            // 【新增】启动成功后的气泡反馈 ("我已经跑起来了")
+            // 只有第一个实例会运行到这里
+            if (_trayIcon != null)
+            {
+                _trayIcon.ShowBalloonTip("AutoGameHDR", "服务已启动，正在后台监测游戏...", BalloonIcon.Info);
+            }
 
             Task.Run(() => CheckForUpdates(false));
 

@@ -1,4 +1,10 @@
-﻿using System.Windows;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows;
+using System.IO;
+// 【关键】引入 WinForms 别名，用于稳定的文件对话框
+using WinForms = System.Windows.Forms;
 
 namespace AutoGameHDR
 {
@@ -29,34 +35,103 @@ namespace AutoGameHDR
                 _items.Add(new GameItem { ProcessName = game, IsEnabled = false });
             }
 
-            // 3. 排序并绑定到界面
+            RefreshDataGrid();
+        }
+
+        private void RefreshDataGrid()
+        {
+            // 排序并重新绑定
             _items = _items.OrderBy(x => x.ProcessName).ToList();
+            GameGrid.ItemsSource = null;
             GameGrid.ItemsSource = _items;
         }
 
-        // 删除按钮点击事件
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
             var item = ((FrameworkElement)sender).DataContext as GameItem;
             if (item != null)
             {
                 _items.Remove(item);
-                // 刷新 DataGrid 显示
-                GameGrid.ItemsSource = null;
-                GameGrid.ItemsSource = _items;
+                RefreshDataGrid();
             }
         }
 
-        // 保存按钮点击事件
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            // 获取主程序实例
             var app = (App)Application.Current;
-
-            // 将修改后的列表传回主程序
             app.UpdateUserList(_items);
-
             this.Close();
+        }
+
+        // ==========================================
+        //  【新增】导入功能
+        // ==========================================
+        private void Import_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                using (var openDialog = new WinForms.OpenFileDialog())
+                {
+                    openDialog.Title = "导入游戏列表 (TXT)";
+                    openDialog.Filter = "文本文件 (*.txt)|*.txt|所有文件 (*.*)|*.*";
+
+                    if (openDialog.ShowDialog() == WinForms.DialogResult.OK)
+                    {
+                        var lines = File.ReadAllLines(openDialog.FileName);
+                        int count = 0;
+
+                        foreach (var line in lines)
+                        {
+                            string cleanName = line.Trim();
+                            if (string.IsNullOrWhiteSpace(cleanName)) continue;
+
+                            // 检查是否已存在 (忽略大小写)
+                            if (!_items.Any(x => x.ProcessName.Equals(cleanName, StringComparison.OrdinalIgnoreCase)))
+                            {
+                                // 导入的默认为启用状态
+                                _items.Add(new GameItem { ProcessName = cleanName, IsEnabled = true });
+                                count++;
+                            }
+                        }
+
+                        RefreshDataGrid();
+                        MessageBox.Show($"成功导入 {count} 个新游戏！\n(重复项已自动忽略)", "导入成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("导入失败：" + ex.Message, "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        // ==========================================
+        //  【新增】导出功能
+        // ==========================================
+        private void Export_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                using (var saveDialog = new WinForms.SaveFileDialog())
+                {
+                    saveDialog.Title = "导出游戏列表";
+                    saveDialog.Filter = "文本文件 (*.txt)|*.txt";
+                    saveDialog.FileName = "AutoGameHDR_Backup.txt";
+
+                    if (saveDialog.ShowDialog() == WinForms.DialogResult.OK)
+                    {
+                        // 只导出名字，一行一个
+                        var lines = _items.Select(x => x.ProcessName).ToList();
+                        File.WriteAllLines(saveDialog.FileName, lines);
+
+                        MessageBox.Show("导出成功！", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("导出失败：" + ex.Message, "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }
