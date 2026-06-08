@@ -72,8 +72,8 @@ namespace AutoGameHDR
             {
                 using (var openDialog = new WinForms.OpenFileDialog())
                 {
-                    openDialog.Title = "导入游戏列表 (TXT)";
-                    openDialog.Filter = "文本文件 (*.txt)|*.txt|所有文件 (*.*)|*.*";
+                    openDialog.Title = "Import Game List (TXT)";
+                    openDialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
 
                     if (openDialog.ShowDialog() == WinForms.DialogResult.OK)
                     {
@@ -95,13 +95,13 @@ namespace AutoGameHDR
                         }
 
                         RefreshDataGrid();
-                        MessageBox.Show($"成功导入 {count} 个新游戏！\n(重复项已自动忽略)", "导入成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                        MessageBox.Show($"Successfully imported {count} new games!\n(Duplicates automatically ignored)", "Import successful", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("导入失败：" + ex.Message, "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Import failed: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -114,8 +114,8 @@ namespace AutoGameHDR
             {
                 using (var saveDialog = new WinForms.SaveFileDialog())
                 {
-                    saveDialog.Title = "导出游戏列表";
-                    saveDialog.Filter = "文本文件 (*.txt)|*.txt";
+                    saveDialog.Title = "Export game list";
+                    saveDialog.Filter = "Text files (*.txt)|*.txt";
                     saveDialog.FileName = "AutoGameHDR_Backup.txt";
 
                     if (saveDialog.ShowDialog() == WinForms.DialogResult.OK)
@@ -124,13 +124,13 @@ namespace AutoGameHDR
                         var lines = _items.Select(x => x.ProcessName).ToList();
                         File.WriteAllLines(saveDialog.FileName, lines);
 
-                        MessageBox.Show("导出成功！", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                        MessageBox.Show("Export successful!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("导出失败：" + ex.Message, "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Export failed: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

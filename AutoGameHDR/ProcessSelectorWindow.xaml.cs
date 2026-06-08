@@ -66,8 +66,8 @@ namespace AutoGameHDR
             {
                 using (var openFileDialog = new WinForms.OpenFileDialog())
                 {
-                    openFileDialog.Title = "选择游戏主程序 (.exe)";
-                    openFileDialog.Filter = "可执行文件 (*.exe)|*.exe";
+                    openFileDialog.Title = "Select game executable (.exe)";
+                    openFileDialog.Filter = "Executable files (*.exe)|*.exe";
                     openFileDialog.Multiselect = false;
                     openFileDialog.CheckFileExists = true;
 
@@ -82,7 +82,7 @@ namespace AutoGameHDR
             }
             catch (Exception ex)
             {
-                MessageBox.Show("打开文件浏览框失败：" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Failed to open the file browser dialog: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -112,7 +112,7 @@ namespace AutoGameHDR
             }
             else
             {
-                MessageBox.Show("请先选择一个进程！");
+                MessageBox.Show("Please select a process first!");
             }
         }
 

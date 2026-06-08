@@ -11,7 +11,7 @@ namespace AutoGameHDR
             var sortedList = globalGames.OrderBy(x => x).ToList();
             GameList.ItemsSource = sortedList;
 
-            this.Title = $"在线云端白名单 (共 {sortedList.Count} 个)";
+            this.Title = $"Online Cloud Whitelist ({sortedList.Count} items total)";
         }
 
         private void Close_Click(object sender, RoutedEventArgs e)

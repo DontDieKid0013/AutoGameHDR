@@ -76,8 +76,8 @@ namespace AutoGameHDR
             if (!createdNew)
             {
                 // 如果 createdNew 为 false，说明锁已经存在，程序已经在运行了
-                MessageBox.Show("AutoGameHDR 已经在后台运行中！\n请检查任务栏右下角的托盘图标。",
-                                "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("AutoGameHDR is already running in the background!\nPlease check the tray icon in the bottom-right corner of the taskbar.",
+                                "Hint", MessageBoxButton.OK, MessageBoxImage.Information);
 
                 // 退出当前这个多余的实例
                 Application.Current.Shutdown();
@@ -98,7 +98,7 @@ namespace AutoGameHDR
             // 只有第一个实例会运行到这里
             if (_trayIcon != null)
             {
-                _trayIcon.ShowBalloonTip("AutoGameHDR", "服务已启动，正在后台监测游戏...", BalloonIcon.Info);
+                _trayIcon.ShowBalloonTip("AutoGameHDR", "Service started, monitoring games in the background...", BalloonIcon.Info);
             }
 
             Task.Run(() => CheckForUpdates(false));
@@ -336,7 +336,7 @@ namespace AutoGameHDR
                 else _disabledUserGames.Add(item.ProcessName);
             }
             SaveUserList();
-            MessageBox.Show("名单更新成功！", "AutoGameHDR", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
+            MessageBox.Show("List updated successfully!", "AutoGameHDR", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
         }
 
         // ==========================================
@@ -465,18 +465,18 @@ namespace AutoGameHDR
                         td.Settings.StopIfGoingOnBatteries = false;
                         td.Settings.ExecutionTimeLimit = TimeSpan.Zero;
                         ts.RootFolder.RegisterTaskDefinition(APP_NAME, td);
-                        MessageBox.Show("已成功设置开机自启 (计划任务)。", "成功", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
+                        MessageBox.Show("Startup on boot has been successfully configured (Scheduled Task).", "Success", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
                     }
                     else
                     {
                         ts.RootFolder.DeleteTask(APP_NAME, false);
-                        MessageBox.Show("已取消开机自启。", "成功", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
+                        MessageBox.Show("Startup on boot disabled.", "Success", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("设置开机启动失败：\n" + ex.Message, "错误", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
+                MessageBox.Show("Failed to set up startup on boot:\n" + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK, MessageBoxOptions.DefaultDesktopOnly);
             }
         }
 
